@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Café & Barista Shop{% endblock %}</title>
+    <meta name="description" content="{% block meta_desc %}Tu tienda especializada en utensilios, filtros y herramientas para café de especialidad en Colombia.{% endblock %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <nav class="navbar" id="navbar">
+        <div class="container">
+            <a href="/" class="nav-logo">☕ <span>Café</span> & Barista</a>
+            <button class="nav-toggle" id="navToggle" aria-label="Menú">☰</button>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="/" class="active">Inicio</a></li>
+                <li><a href="/productos/">Productos</a></li>
+                <li><a href="/nosotros/">Nosotros</a></li>
+                <li>
+                    <a href="#" class="nav-cart" id="cartToggle">
+                        🛒 <span class="cart-badge hidden" id="cartBadge">0</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    {% block content %}{% endblock %}
+
+    <div class="whatsapp-float" id="whatsappFloat" title="Escríbenos por WhatsApp">
+        💬
+        <span class="whatsapp-tooltip">¡Escríbenos!</span>
+    </div>
+
+    <div class="cart-overlay" id="cartOverlay"></div>
+    <div class="cart-sidebar" id="cartSidebar">
+        <div class="cart-header">
+            <h2>🛒 Tu carrito</h2>
+            <button class="cart-close" id="cartClose">✕</button>
+        </div>
+        <div class="cart-items" id="cartItems">
+            <div class="cart-empty">
+                <span class="empty-icon">🛒</span>
+                <p>Tu carrito está vacío</p>
+            </div>
+        </div>
+        <div class="cart-footer" id="cartFooter" style="display:none">
+            <div class="cart-total">
+                <span>Total</span>
+                <span id="cartTotal">$0 COP</span>
+            </div>
+            <button class="cart-btn-pagar cart-btn-whatsapp" id="whatsappCheckoutBtn">Pedir por WhatsApp</button>
+            <button class="cart-btn-pagar cart-btn-mp" id="checkoutBtn" style="display:none;margin-top:0.5rem">Pagar con MercadoPago</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="productModal">
+        <div class="modal">
+            <button class="modal-close" id="modalClose">✕</button>
+            <img class="modal-producto-img" id="modalImg" src="" alt="">
+            <h3 class="modal-producto-nombre" id="modalNombre"></h3>
+            <p class="modal-producto-desc" id="modalDesc"></p>
+            <p class="modal-producto-precio" id="modalPrecio"></p>
+            <div class="modal-actions">
+                <button class="btn btn-primary" id="modalAgregar">Agregar al carrito</button>
+                <button class="btn btn-whatsapp" id="modalWhatsApp">Consultar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="/js/config.js"></script>
+    <script src="/js/main.js"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

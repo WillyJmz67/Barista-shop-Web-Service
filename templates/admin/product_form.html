@@ -1,0 +1,72 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}{{ "Editar" if producto else "Nuevo" }} producto{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1>{{ "Editar" if producto else "Nuevo" }} producto</h1>
+    <a href="/admin/productos" class="btn-admin btn-admin-primary">← Volver</a>
+</div>
+
+<form class="admin-form" method="POST">
+    <div class="form-row">
+        <div class="form-group">
+            <label>Nombre *</label>
+            <input type="text" name="nombre" value="{{ producto.nombre if producto else '' }}" required>
+        </div>
+        <div class="form-group">
+            <label>Slug *</label>
+            <input type="text" name="slug" value="{{ producto.slug if producto else '' }}" required>
+            <div class="help">Identificador para la URL. Ej: cafetera-francesa</div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label>Descripción corta</label>
+        <textarea name="descripcion_corta">{{ producto.descripcion_corta if producto else '' }}</textarea>
+        <div class="help">Texto breve que aparece en la tarjeta del producto</div>
+    </div>
+
+    <div class="form-group">
+        <label>Descripción larga</label>
+        <textarea name="descripcion" style="min-height:100px">{{ producto.descripcion if producto else '' }}</textarea>
+        <div class="help">Texto completo que aparece en el modal del producto</div>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group">
+            <label>Precio (COP) *</label>
+            <input type="number" name="precio" value="{{ producto.precio if producto else '' }}" required>
+        </div>
+        <div class="form-group">
+            <label>Categoría</label>
+            <select name="categoria">
+                <option value="utensilios" {{ "selected" if producto and producto.categoria == "utensilios" else "" }}>Utensilios</option>
+                <option value="filtros" {{ "selected" if producto and producto.categoria == "filtros" else "" }}>Filtros</option>
+                <option value="herramientas" {{ "selected" if producto and producto.categoria == "herramientas" else "" }}>Herramientas</option>
+                <option value="accesorios" {{ "selected" if producto and producto.categoria == "accesorios" else "" }}>Accesorios</option>
+                <option value="kits" {{ "selected" if producto and producto.categoria == "kits" else "" }}>Kits</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label>URL de la imagen</label>
+        <input type="url" name="imagen" value="{{ producto.imagen if producto else '' }}">
+        <div class="help">Usa imágenes de Unsplash o sube a imgur.com</div>
+    </div>
+
+    <div class="form-row">
+        <div class="form-check">
+            <input type="checkbox" name="destacado" id="destacado" {{ "checked" if producto and producto.destacado else "" }}>
+            <label for="destacado">Producto destacado</label>
+        </div>
+        <div class="form-check">
+            <input type="checkbox" name="stock" id="stock" {{ "checked" if not producto or producto.stock else "" }}>
+            <label for="stock">Disponible</label>
+        </div>
+    </div>
+
+    <button type="submit" class="btn-admin btn-admin-primary" style="margin-top:0.5rem">
+        {{ "Guardar cambios" if producto else "Crear producto" }}
+    </button>
+</form>
+{% endblock %}

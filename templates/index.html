@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block title %}Café & Barista Shop - Utensilios y herramientas para café de especialidad{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-content container">
+        <h1>Todo para tu <span>café de especialidad</span></h1>
+        <p>Encuentra los mejores utensilios, filtros y herramientas para preparar café como un profesional en casa. Envíos a toda Colombia.</p>
+        <div class="hero-buttons">
+            <a href="/productos/" class="btn btn-primary">Ver productos</a>
+            <a href="#" class="btn btn-secondary" id="heroWhatsApp">Consultar por WhatsApp</a>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="section-header">
+            <h2>Categorías</h2>
+            <p>Encuentra todo lo que necesitas para tu ritual de café</p>
+        </div>
+        <div class="categorias-grid">
+            <a href="/productos/?cat=utensilios" class="categoria-card">
+                <span class="categoria-icon">☕</span>
+                <h3>Utensilios</h3>
+                <p>Cafeteras, Chemex, V60 y más</p>
+            </a>
+            <a href="/productos/?cat=filtros" class="categoria-card">
+                <span class="categoria-icon">🔬</span>
+                <h3>Filtros</h3>
+                <p>Papel, metal, tela para cada método</p>
+            </a>
+            <a href="/productos/?cat=herramientas" class="categoria-card">
+                <span class="categoria-icon">⚙️</span>
+                <h3>Herramientas</h3>
+                <p>Molinos, básculas, teteras y más</p>
+            </a>
+            <a href="/productos/?cat=accesorios" class="categoria-card">
+                <span class="categoria-icon">🎨</span>
+                <h3>Accesorios</h3>
+                <p>Tazas, jarras y complementos</p>
+            </a>
+            <a href="/productos/?cat=kits" class="categoria-card">
+                <span class="categoria-icon">🎁</span>
+                <h3>Kits</h3>
+                <p>Combos completos para regalar</p>
+            </a>
+        </div>
+    </div>
+</section>
+
+<section class="section destacados">
+    <div class="container">
+        <div class="section-header">
+            <h2>Productos destacados</h2>
+            <p>Lo más vendido de la tienda</p>
+        </div>
+        <div class="productos-grid" id="destacadosGrid"></div>
+    </div>
+</section>
+
+<section class="newsletter">
+    <div class="container">
+        <h2>¿Nuevos productos y ofertas?</h2>
+        <p>Suscríbete y entérate primero de nuestros lanzamientos y promociones.</p>
+        <form class="newsletter-form" id="newsletterForm">
+            <input type="email" placeholder="Tu correo electrónico" required>
+            <button type="submit">Suscribirme</button>
+        </form>
+    </div>
+</section>
+
+<footer class="footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h4>☕ Café & Barista Shop</h4>
+                <p>Tu tienda colombiana de confianza para equipar tu barista en casa. Productos seleccionados para los amantes del café de especialidad.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Productos</h4>
+                <ul>
+                    <li><a href="/productos/?cat=utensilios">Utensilios</a></li>
+                    <li><a href="/productos/?cat=filtros">Filtros</a></li>
+                    <li><a href="/productos/?cat=herramientas">Herramientas</a></li>
+                    <li><a href="/productos/?cat=accesorios">Accesorios</a></li>
+                    <li><a href="/productos/?cat=kits">Kits</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Ayuda</h4>
+                <ul>
+                    <li><a href="#">Cómo comprar</a></li>
+                    <li><a href="#">Envíos y entregas</a></li>
+                    <li><a href="#">Garantía y cambios</a></li>
+                    <li><a href="#">Preguntas frecuentes</a></li>
+                    <li><a href="#">Contacto</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Contacto</h4>
+                <ul>
+                    <li><a href="#" id="footerWhatsApp">📱 WhatsApp</a></li>
+                    <li><a href="#">📧 hola@cafebarista.co</a></li>
+                    <li><a href="#">📍 Bogotá, Colombia</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>&copy; 2026 Café & Barista Shop. Todos los derechos reservados.</span>
+            <div class="footer-social">
+                <a href="#" title="Instagram">📷</a>
+                <a href="#" title="TikTok">🎵</a>
+                <a href="#" title="YouTube">▶️</a>
+            </div>
+        </div>
+    </div>
+</footer>
+{% endblock %}
+
+{% block scripts %}
+<script src="/js/index.js"></script>
+{% endblock %}

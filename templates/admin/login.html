@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Café & Barista Shop</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .admin-login {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--color-bg);
+        }
+        .login-card {
+            background: white;
+            padding: 2.5rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-md);
+            width: 100%;
+            max-width: 400px;
+        }
+        .login-card h1 {
+            font-size: 1.5rem;
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+        .login-card p {
+            text-align: center;
+            color: var(--color-text-light);
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+        .login-card input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-sm);
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+        .login-card button {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--color-primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .error {
+            color: #e74c3c;
+            font-size: 0.85rem;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 1rem;
+            font-size: 0.85rem;
+            color: var(--color-text-light);
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-login">
+        <div class="login-card">
+            <h1>🔐 Admin</h1>
+            <p>Café & Barista Shop</p>
+            {% if error %}<div class="error">{{ error }}</div>{% endif %}
+            <form method="POST">
+                <input type="password" name="password" placeholder="Contraseña" required autofocus>
+                <button type="submit">Ingresar</button>
+            </form>
+            <a href="/" class="back-link">← Volver a la tienda</a>
+        </div>
+    </div>
+</body>
+</html>

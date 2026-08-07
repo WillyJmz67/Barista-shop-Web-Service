@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: cafe-barista-shop
+    env: python
+    buildCommand: pip install -r requirements.txt && python seed.py
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT
+    envVars:
+      - key: WHATSAPP_NUMBER
+        sync: false
+      - key: MP_ACCESS_TOKEN
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: DATABASE_URL
+        fromDatabase:
+          name: cafe-barista-db
+          property: connectionString
+      - key: FLASK_SECRET_KEY
+        generateValue: true
+
+databases:
+  - name: cafe-barista-db
+    databaseName: tienda
+    plan: free

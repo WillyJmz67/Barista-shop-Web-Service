@@ -1,0 +1,63 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Pedidos{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1>Pedidos ({{ orders|length }})</h1>
+</div>
+
+{% if orders %}
+<table class="admin-table">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Cliente / Envío</th>
+            <th>Productos</th>
+            <th>Total</th>
+            <th>Estado</th>
+            <th>Fecha</th>
+            <th>Acción</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for o in orders %}
+        <tr>
+            <td>{{ o.id }}</td>
+            <td style="font-size:0.8rem">
+                <strong>{{ o.customer_name or '—' }}</strong><br>
+                {{ o.customer_phone or '' }}<br>
+                <small>{{ o.shipping_address or '' }}, {{ o.shipping_city or '' }}</small>
+            </td>
+            <td>
+                <ul style="list-style:none;padding:0;margin:0;font-size:0.8rem">
+                    {% for item in o.items %}
+                    <li>{{ item.cantidad }}x {{ item.product_name }} (${{ "{:,.0f}".format(item.precio) }})</li>
+                    {% endfor %}
+                </ul>
+            </td>
+            <td>${{ "{:,.0f}".format(o.total) }} COP</td>
+            <td>
+                <span class="badge badge-{{ o.status.lower() }}">{{ o.status }}</span>
+                {% if o.payment_id %}
+                <div style="font-size:0.7rem;color:var(--admin-text-light);margin-top:2px">ID: {{ o.payment_id[:12] }}...</div>
+                {% endif %}
+            </td>
+            <td>{{ o.created_at.strftime("%d/%m/%Y") }}<br><small>{{ o.created_at.strftime("%H:%M") }}</small></td>
+            <td>
+                <form method="POST" action="/admin/pedidos/{{ o.id }}/estado" style="display:flex;gap:0.35rem;flex-direction:column">
+                    <select name="status" style="font-size:0.75rem;padding:0.25rem;border:1px solid var(--admin-border);border-radius:4px">
+                        <option value="Pendiente" {{ "selected" if o.status == "Pendiente" else "" }}>Pendiente</option>
+                        <option value="Pagado" {{ "selected" if o.status == "Pagado" else "" }}>Pagado</option>
+                        <option value="Enviado" {{ "selected" if o.status == "Enviado" else "" }}>Enviado</option>
+                        <option value="Cancelado" {{ "selected" if o.status == "Cancelado" else "" }}>Cancelado</option>
+                    </select>
+                    <button class="btn-admin btn-admin-primary btn-admin-sm">Actualizar</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p style="color:var(--admin-text-light)">No hay pedidos todavía.</p>
+{% endif %}
+{% endblock %}

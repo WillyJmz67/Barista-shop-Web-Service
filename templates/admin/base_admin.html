@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Admin{% endblock %} - Café & Barista Shop</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+    <nav class="admin-nav">
+        <div class="container">
+            <a href="/admin/" class="admin-nav-brand">☕ Admin</a>
+            <ul class="admin-nav-links">
+                <li><a href="/admin/">Dashboard</a></li>
+                <li><a href="/admin/productos">Productos</a></li>
+                <li><a href="/admin/pedidos">Pedidos</a></li>
+                <li><a href="/admin/logout">Cerrar sesión</a></li>
+                <li><a href="/">← Tienda</a></li>
+            </ul>
+        </div>
+    </nav>
+    <main class="admin-main container">
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

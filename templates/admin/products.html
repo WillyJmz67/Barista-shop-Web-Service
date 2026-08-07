@@ -1,0 +1,44 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Productos{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1>Productos</h1>
+    <a href="/admin/productos/nuevo" class="btn-admin btn-admin-primary">+ Nuevo producto</a>
+</div>
+
+{% if productos %}
+<table class="admin-table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Categoría</th>
+            <th>Precio</th>
+            <th>Destacado</th>
+            <th>Stock</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for p in productos %}
+        <tr>
+            <td>{{ p.id }}</td>
+            <td>{{ p.nombre }}</td>
+            <td>{{ p.categoria }}</td>
+            <td>${{ "{:,.0f}".format(p.precio) }}</td>
+            <td>{{ "⭐" if p.destacado else "—" }}</td>
+            <td>{{ "✅" if p.stock else "❌" }}</td>
+            <td class="action-cell">
+                <a href="/admin/productos/editar/{{ p.id }}" class="btn-admin btn-admin-primary btn-admin-sm">Editar</a>
+                <form method="POST" action="/admin/productos/eliminar/{{ p.id }}" onsubmit="return confirm('¿Eliminar {{ p.nombre }}?')">
+                    <button class="btn-admin btn-admin-danger btn-admin-sm">Eliminar</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p style="color:var(--admin-text-light)">No hay productos. <a href="/admin/productos/nuevo">Agrega el primero</a>.</p>
+{% endif %}
+{% endblock %}

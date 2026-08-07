@@ -1,0 +1,56 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1>Dashboard</h1>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <h3>Total productos</h3>
+        <div class="stat-number">{{ total_products }}</div>
+    </div>
+    <div class="stat-card">
+        <h3>Total pedidos</h3>
+        <div class="stat-number">{{ total_orders }}</div>
+    </div>
+    <div class="stat-card">
+        <h3>Ingresos totales</h3>
+        <div class="stat-number revenue">{{ "{:,.0f}".format(total_revenue) }}</div>
+    </div>
+    <div class="stat-card">
+        <h3>Pendientes</h3>
+        <div class="stat-number">{{ pending_orders }}</div>
+    </div>
+    <div class="stat-card">
+        <h3>Pagados</h3>
+        <div class="stat-number">{{ paid_orders }}</div>
+    </div>
+</div>
+
+<h2 style="font-size:1.1rem;color:var(--admin-primary);margin-bottom:0.75rem">Pedidos recientes</h2>
+{% if recent_orders %}
+<table class="admin-table">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Total</th>
+            <th>Estado</th>
+            <th>Fecha</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for o in recent_orders %}
+        <tr>
+            <td>{{ o.id }}</td>
+            <td>${{ "{:,.0f}".format(o.total) }} COP</td>
+            <td><span class="badge badge-{{ o.status.lower() }}">{{ o.status }}</span></td>
+            <td>{{ o.created_at.strftime("%d/%m/%Y %H:%M") }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p style="color:var(--admin-text-light)">No hay pedidos aún.</p>
+{% endif %}
+{% endblock %}
