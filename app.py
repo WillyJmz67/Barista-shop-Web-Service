@@ -21,6 +21,16 @@ logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 
+# En Vercel serverless /var/task es read-only. Flask-SQLAlchemy intenta crear
+# app.instance_path (por defecto /var/task/instance) en init_app().
+# Redirigimos a /tmp (writable) para evitar OSError: [Errno 30] Read-only file system.
+if os.environ.get("VERCEL"):
+    app.instance_path = "/tmp"
+    try:
+        os.makedirs(app.instance_path, exist_ok=True)
+    except OSError:
+        pass
+
 # Secret key: Vercel + Supabase -> SIEMPRE por variable de entorno en producción.
 # En serverless el filesystem es read-only, no se puede persistir .flask_secret.
 _default_secret = os.environ.get("FLASK_SECRET_KEY")
