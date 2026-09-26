@@ -61,7 +61,7 @@ function initNewsletter() {
   if (form) {
     form.addEventListener("submit", (e) => {
       e.preventDefault();
-      showToast("📬", "¡Gracias por suscribirte!");
+      showToast("—", "Bienvenido al Círculo Barista. Revisa tu correo.");
       form.querySelector("input").value = "";
     });
   }
@@ -94,7 +94,7 @@ function updateCartUI() {
 
   if (items) {
     if (cart.length === 0) {
-      items.innerHTML = `<div class="cart-empty"><span class="empty-icon">🛒</span><p>Tu carrito está vacío</p></div>`;
+      items.innerHTML = `<div class="cart-empty"><span class="empty-icon">—</span><p>Tu carrito está vacío.<br><span>Explora la boutique y encuentra tu ritual.</span></p></div>`;
       if (footer) footer.style.display = "none";
       return;
     }
@@ -130,7 +130,7 @@ function updateTotal() {
 
 function agregarAlCarrito(producto) {
   if (producto.stock === false) {
-    showToast("⚠️", "Producto agotado");
+    showToast("!", "Pieza agotada por el momento");
     return;
   }
   const cart = getCart();
@@ -142,7 +142,7 @@ function agregarAlCarrito(producto) {
   }
   setCart(cart);
   updateCartUI();
-  showToast("☕", `${producto.nombre} agregado al carrito`);
+  showToast("✓", `${producto.nombre} añadido a tu selección`);
 }
 
 window.cambiarCantidad = function(id, delta) {
@@ -228,14 +228,14 @@ async function checkoutWhatsApp(cart, shipping = null) {
       closeShippingModal();
       window.open(data.url, "_blank");
     } else {
-      showToast("⚠️", "No se pudo generar el pedido. Intenta de nuevo.");
+      showToast("!", "No se pudo generar el pedido. Intenta de nuevo.");
     }
   } catch {
-    showToast("⚠️", "Error de conexión. Intenta de nuevo.");
+    showToast("!", "Error de conexión. Intenta de nuevo.");
   } finally {
     if (btn) {
       btn.disabled = false;
-      btn.textContent = "Pedir por WhatsApp";
+      btn.textContent = "Confirmar por WhatsApp";
     }
   }
 }
@@ -329,10 +329,10 @@ async function handleShippingSubmit(e) {
       window.closeCartSidebar?.();
       window.open(data.url, "_blank");
     } else {
-      showToast("⚠️", "Error al procesar. Intenta por WhatsApp.");
+      showToast("!", "Error al procesar. Intenta por WhatsApp.");
     }
   } catch {
-    showToast("⚠️", "Error de conexión. Intenta por WhatsApp.");
+    showToast("!", "Error de conexión. Intenta por WhatsApp.");
   } finally {
     btn.disabled = false;
     btn.textContent = "Continuar al pago";
@@ -381,12 +381,14 @@ window.abrirModal = function(producto) {
   document.getElementById("modalNombre").textContent = producto.nombre;
   document.getElementById("modalDesc").textContent = producto.descripcion || producto.descripcion_corta;
   document.getElementById("modalPrecio").textContent = formatPrice(producto.precio);
+  const catEl = document.getElementById("modalCat");
+  if (catEl) catEl.textContent = producto.categoria ? producto.categoria.charAt(0).toUpperCase() + producto.categoria.slice(1) : "Selección de la casa";
 
   const agregarBtn = document.getElementById("modalAgregar");
   if (agregarBtn) {
     const sinStock = producto.stock === false;
     agregarBtn.disabled = sinStock;
-    agregarBtn.textContent = sinStock ? "Agotado" : "Agregar al carrito";
+    agregarBtn.textContent = sinStock ? "Agotado" : "Añadir al carrito";
   }
 
   document.getElementById("productModal").classList.add("open");
@@ -426,11 +428,11 @@ window.renderProductos = function(productos, containerId = "productosGrid") {
       <div class="producto-info">
         <span class="producto-categoria">${p.categoria}</span>
         <h3 class="producto-nombre">${p.nombre}</h3>
-        <p class="producto-descripcion">${p.descripcion_corta}</p>
+        <p class="producto-descripcion">${p.descripcion_corta || ""}</p>
         <div class="producto-footer">
           <span class="producto-precio">${Math.round(p.precio).toLocaleString("es-CO")}</span>
           <button class="btn-agregar${sinStock ? " agotado" : ""}" data-idx="${i}" ${sinStock ? "disabled" : ""}>
-            ${sinStock ? "Agotado" : "+ Agregar"}
+            ${sinStock ? "Agotado" : "Añadir"}
           </button>
         </div>
       </div>

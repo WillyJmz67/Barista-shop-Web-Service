@@ -31,6 +31,7 @@
             <td class="action-cell">
                 <a href="/admin/productos/editar/{{ p.id }}" class="btn-admin btn-admin-primary btn-admin-sm">Editar</a>
                 <form method="POST" action="/admin/productos/eliminar/{{ p.id }}" onsubmit="return confirm('¿Eliminar {{ p.nombre }}?')">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <button class="btn-admin btn-admin-danger btn-admin-sm">Eliminar</button>
                 </form>
             </td>

@@ -44,6 +44,7 @@
             <td>{{ o.created_at.strftime("%d/%m/%Y") }}<br><small>{{ o.created_at.strftime("%H:%M") }}</small></td>
             <td>
                 <form method="POST" action="/admin/pedidos/{{ o.id }}/estado" style="display:flex;gap:0.35rem;flex-direction:column">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <select name="status" style="font-size:0.75rem;padding:0.25rem;border:1px solid var(--admin-border);border-radius:4px">
                         <option value="Pendiente" {{ "selected" if o.status == "Pendiente" else "" }}>Pendiente</option>
                         <option value="Pagado" {{ "selected" if o.status == "Pagado" else "" }}>Pagado</option>

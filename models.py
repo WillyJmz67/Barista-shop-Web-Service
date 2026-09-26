@@ -10,13 +10,13 @@ class Product(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(200), nullable=False)
-    slug = db.Column(db.String(200), nullable=False)
+    slug = db.Column(db.String(200), nullable=False, unique=True, index=True)
     descripcion = db.Column(db.Text, default="")
     descripcion_corta = db.Column(db.String(300), default="")
     precio = db.Column(db.Integer, nullable=False)
     imagen = db.Column(db.String(500), default="")
-    categoria = db.Column(db.String(50), default="utensilios")
-    destacado = db.Column(db.Boolean, default=False)
+    categoria = db.Column(db.String(50), default="utensilios", index=True)
+    destacado = db.Column(db.Boolean, default=False, index=True)
     stock = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
@@ -48,10 +48,10 @@ class Order(db.Model):
     shipping_phone = db.Column(db.String(50), default="")
     shipping_notes = db.Column(db.Text, default="")
     total = db.Column(db.Integer, default=0)
-    status = db.Column(db.String(50), default="Pendiente")
+    status = db.Column(db.String(50), default="Pendiente", index=True)
     payment_id = db.Column(db.String(200), default="")
     preference_id = db.Column(db.String(200), default="")
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
 
     items = db.relationship("OrderItem", backref="order", lazy=True)
 

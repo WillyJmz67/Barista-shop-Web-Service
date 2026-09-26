@@ -1,15 +1,31 @@
 {% extends "base.html" %}
 
-{% block title %}Café & Barista Shop - Utensilios y herramientas para café de especialidad{% endblock %}
+{% block title %}Café & Barista — Curaduría de café de especialidad{% endblock %}
 
 {% block content %}
 <section class="hero">
-    <div class="hero-content container">
-        <h1>Todo para tu <span>café de especialidad</span></h1>
-        <p>Encuentra los mejores utensilios, filtros y herramientas para preparar café como un profesional en casa. Envíos a toda Colombia.</p>
-        <div class="hero-buttons">
-            <a href="/productos/" class="btn btn-primary">Ver productos</a>
-            <a href="#" class="btn btn-secondary" id="heroWhatsApp">Consultar por WhatsApp</a>
+    <div class="container hero-grid">
+        <div>
+            <p class="eyebrow" style="color:var(--gold)">Villavicencio · Colombia — Desde 2026</p>
+            <h1>El arte del <span>café de especialidad</span>, en casa.</h1>
+            <p class="lead">Una boutique curada por baristas: métodos de extracción, molienda de precisión y accesorios atemporales. Te asesoramos por WhatsApp y enviamos a todo el país.</p>
+            <div class="hero-buttons">
+                <a href="/productos/" class="btn btn-primary">Explorar la boutique</a>
+                <a href="#" class="btn btn-secondary" id="heroWhatsApp">Hablar con un barista</a>
+            </div>
+            <div class="hero-meta">
+                <div><strong>+16</strong><span>Piezas curadas</span></div>
+                <div><strong>100%</strong><span>Atención personal</span></div>
+                <div><strong>24–72h</strong><span>Despacho nacional</span></div>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=900&q=80" alt="Ritual de café de especialidad">
+            <div class="hero-card">
+                <p class="eyebrow">Selección de la casa</p>
+                <strong>Kit Barista Iniciación</strong>
+                <span>V60 · Filtros · Báscula · Tetera — $320.000 COP</span>
+            </div>
         </div>
     </div>
 </section>
@@ -17,34 +33,36 @@
 <section class="section">
     <div class="container">
         <div class="section-header">
-            <h2>Categorías</h2>
-            <p>Encuentra todo lo que necesitas para tu ritual de café</p>
+            <p class="eyebrow">La colección</p>
+            <h2>Compra por ritual, no por producto</h2>
+            <p>Cinco universos para elevar cada taza, del filtrado delicado al espresso intenso.</p>
+            <div class="divider"></div>
         </div>
         <div class="categorias-grid">
             <a href="/productos/?cat=utensilios" class="categoria-card">
-                <span class="categoria-icon">☕</span>
+                <span class="categoria-icon">I</span>
                 <h3>Utensilios</h3>
-                <p>Cafeteras, Chemex, V60 y más</p>
+                <p>Chemex, V60, Moka y prensa</p>
             </a>
             <a href="/productos/?cat=filtros" class="categoria-card">
-                <span class="categoria-icon">🔬</span>
+                <span class="categoria-icon">II</span>
                 <h3>Filtros</h3>
-                <p>Papel, metal, tela para cada método</p>
+                <p>Papel, metal y micro-filtros</p>
             </a>
             <a href="/productos/?cat=herramientas" class="categoria-card">
-                <span class="categoria-icon">⚙️</span>
+                <span class="categoria-icon">III</span>
                 <h3>Herramientas</h3>
-                <p>Molinos, básculas, teteras y más</p>
+                <p>Molinos, básculas y teteras</p>
             </a>
             <a href="/productos/?cat=accesorios" class="categoria-card">
-                <span class="categoria-icon">🎨</span>
+                <span class="categoria-icon">IV</span>
                 <h3>Accesorios</h3>
-                <p>Tazas, jarras y complementos</p>
+                <p>Cerámica y latte art</p>
             </a>
             <a href="/productos/?cat=kits" class="categoria-card">
-                <span class="categoria-icon">🎁</span>
+                <span class="categoria-icon">V</span>
                 <h3>Kits</h3>
-                <p>Combos completos para regalar</p>
+                <p>Cofres para regalar o iniciar</p>
             </a>
         </div>
     </div>
@@ -53,20 +71,43 @@
 <section class="section destacados">
     <div class="container">
         <div class="section-header">
-            <h2>Productos destacados</h2>
-            <p>Lo más vendido de la tienda</p>
+            <p class="eyebrow">Los favoritos</p>
+            <h2>Piezas destacadas</h2>
+            <p>Las más elegidas por nuestra comunidad de baristas en casa.</p>
+            <div class="divider"></div>
         </div>
         <div class="productos-grid" id="destacadosGrid"></div>
+        <div style="text-align:center;margin-top:2.2rem">
+            <a href="/productos/" class="btn btn-outline" style="border-radius:999px">Ver catálogo completo</a>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container craft">
+        <img src="https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=900&q=80" alt="Barista preparando café filtrado">
+        <div>
+            <p class="eyebrow">La casa</p>
+            <h2>Curaduría lenta, café honesto.</h2>
+            <p>No vendemos volumen: seleccionamos pocas piezas, probadas en mesa, que duran años. Cada pedido incluye guía de receta y asesoría directa por WhatsApp.</p>
+            <ul class="check-list">
+                <li>Selección probada por baristas colombianos</li>
+                <li>Guía de molienda y receta en cada compra</li>
+                <li>Garantía, cambios y repuestos sin fricción</li>
+            </ul>
+            <a href="/nosotros/" class="btn btn-primary">Conocer la historia</a>
+        </div>
     </div>
 </section>
 
 <section class="newsletter">
     <div class="container">
-        <h2>¿Nuevos productos y ofertas?</h2>
-        <p>Suscríbete y entérate primero de nuestros lanzamientos y promociones.</p>
+        <p class="eyebrow" style="color:var(--gold)">Círculo Barista</p>
+        <h2>Catas, lanzamientos y ediciones limitadas</h2>
+        <p>Una carta mensual. Sin ruido, solo café.</p>
         <form class="newsletter-form" id="newsletterForm">
-            <input type="email" placeholder="Tu correo electrónico" required>
-            <button type="submit">Suscribirme</button>
+            <input type="email" placeholder="Tu correo electrónico" required aria-label="Correo">
+            <button type="submit">Unirme</button>
         </form>
     </div>
 </section>
@@ -75,11 +116,11 @@
     <div class="container">
         <div class="footer-grid">
             <div class="footer-col">
-                <h4>☕ Café & Barista Shop</h4>
-                <p>Tu tienda colombiana de confianza para equipar tu barista en casa. Productos seleccionados para los amantes del café de especialidad.</p>
+                <h4>Café & Barista</h4>
+                <p>Boutique colombiana de café de especialidad. Piezas atemporales, asesoría real y envíos a todo el país.</p>
             </div>
             <div class="footer-col">
-                <h4>Productos</h4>
+                <h4>Boutique</h4>
                 <ul>
                     <li><a href="/productos/?cat=utensilios">Utensilios</a></li>
                     <li><a href="/productos/?cat=filtros">Filtros</a></li>
@@ -95,24 +136,23 @@
                     <li><a href="#">Envíos y entregas</a></li>
                     <li><a href="#">Garantía y cambios</a></li>
                     <li><a href="#">Preguntas frecuentes</a></li>
-                    <li><a href="#">Contacto</a></li>
                 </ul>
             </div>
             <div class="footer-col">
                 <h4>Contacto</h4>
                 <ul>
-                    <li><a href="#" id="footerWhatsApp">📱 WhatsApp</a></li>
-                    <li><a href="#">📧 hola@cafebarista.co</a></li>
-                    <li><a href="#">📍 Bogotá, Colombia</a></li>
+                    <li><a href="#" id="footerWhatsApp">WhatsApp concierge</a></li>
+                    <li><a href="#">hola@cafebarista.co</a></li>
+                    <li><a href="#">Villavicencio, Colombia</a></li>
                 </ul>
             </div>
         </div>
         <div class="footer-bottom">
-            <span>&copy; 2026 Café & Barista Shop. Todos los derechos reservados.</span>
+            <span>&copy; 2026 Café & Barista. Todos los derechos reservados.</span>
             <div class="footer-social">
-                <a href="#" title="Instagram">📷</a>
-                <a href="#" title="TikTok">🎵</a>
-                <a href="#" title="YouTube">▶️</a>
+                <a href="#" title="Instagram">Ig</a>
+                <a href="#" title="TikTok">Tk</a>
+                <a href="#" title="YouTube">Yt</a>
             </div>
         </div>
     </div>

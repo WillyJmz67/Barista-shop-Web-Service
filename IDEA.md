@@ -1,0 +1,5 @@
+La carpeta CAFE-SHOP abarca un proyecto personal de  web landing para venta de herramientas de cafe y en un futuro bolsas de cafe. Dentro de la carpeta hay un pagina web (analizala) que muestra diferente informacion (informacion de la empresa luego sera cambiada), un apartado secreto de admin para modificar productos, precios, stock y mas. El despliegue de la pagina es usando la plataforma RENDER, plan gratuito. La idea de negocio es, que el cliente vea la pagina, vea productos con imagenes descripcion, precio, etc, se agregue a un carrito y redirija a mi whatsapp con un mensaje que incluya un saludo y los productos que selecciono, ya la parte de comunicacion por whatsapp me encargo yo. 
+
+La idea de este proyecto es escalarlo mas adelante donde se agreue mas interaccion, bonos de descuento, subir el plan de render, o usar base de datos para gestionar pedidos, pero eso sera despues.
+
+Por el momento, analiza los archivos, corrige, mejora opmitza lo que consideres util para que todo lo mencionado en el primer parrafo. Al final, conectate a la terminal con mis credenciales (o me das la guia para hacerlo), y tira un push a mi github

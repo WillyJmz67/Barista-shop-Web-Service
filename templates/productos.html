@@ -1,18 +1,20 @@
 {% extends "base.html" %}
 
-{% block title %}Productos - Café & Barista Shop{% endblock %}
-{% block meta_desc %}Explora nuestro catálogo de utensilios, filtros, herramientas y accesorios para café de especialidad. Envíos a toda Colombia.{% endblock %}
+{% block title %}Boutique — Café & Barista{% endblock %}
+{% block meta_desc %}Catálogo curado de utensilios, filtros, herramientas y accesorios para café de especialidad. Envíos a toda Colombia.{% endblock %}
 
 {% block content %}
 <section class="section" style="padding-top:3rem">
     <div class="container">
         <div class="section-header">
-            <h1>Productos</h1>
-            <p>Explora nuestro catálogo completo</p>
+            <p class="eyebrow">Catálogo</p>
+            <h1>La Boutique</h1>
+            <p>Cada pieza fue probada en mesa antes de entrar a la colección.</p>
+            <div class="divider"></div>
         </div>
 
-        <div class="filtros" style="display:flex;gap:0.75rem;flex-wrap:wrap;justify-content:center;margin-bottom:2rem">
-            <button class="btn btn-outline filtro-btn active" data-cat="todas">Todas</button>
+        <div class="filtros">
+            <button class="btn btn-outline filtro-btn active" data-cat="todas">Toda la colección</button>
             <button class="btn btn-outline filtro-btn" data-cat="utensilios">Utensilios</button>
             <button class="btn btn-outline filtro-btn" data-cat="filtros">Filtros</button>
             <button class="btn btn-outline filtro-btn" data-cat="herramientas">Herramientas</button>
@@ -28,11 +30,11 @@
     <div class="container">
         <div class="footer-grid">
             <div class="footer-col">
-                <h4>☕ Café & Barista Shop</h4>
-                <p>Tu tienda colombiana de confianza para equipar tu barista en casa.</p>
+                <h4>Café & Barista</h4>
+                <p>Curaduría colombiana para el ritual del café en casa.</p>
             </div>
             <div class="footer-col">
-                <h4>Productos</h4>
+                <h4>Boutique</h4>
                 <ul>
                     <li><a href="/productos/?cat=utensilios">Utensilios</a></li>
                     <li><a href="/productos/?cat=filtros">Filtros</a></li>
@@ -53,18 +55,18 @@
             <div class="footer-col">
                 <h4>Contacto</h4>
                 <ul>
-                    <li><a href="#" id="footerWhatsApp">📱 WhatsApp</a></li>
-                    <li><a href="#">📧 hola@cafebarista.co</a></li>
-                    <li><a href="#">📍 Bogotá, Colombia</a></li>
+                    <li><a href="#" id="footerWhatsApp">WhatsApp concierge</a></li>
+                    <li><a href="#">hola@cafebarista.co</a></li>
+                    <li><a href="#">Villavicencio, Colombia</a></li>
                 </ul>
             </div>
         </div>
         <div class="footer-bottom">
-            <span>&copy; 2026 Café & Barista Shop. Todos los derechos reservados.</span>
+            <span>&copy; 2026 Café & Barista. Todos los derechos reservados.</span>
             <div class="footer-social">
-                <a href="#" title="Instagram">📷</a>
-                <a href="#" title="TikTok">🎵</a>
-                <a href="#" title="YouTube">▶️</a>
+                <a href="#" title="Instagram">Ig</a>
+                <a href="#" title="TikTok">Tk</a>
+                <a href="#" title="YouTube">Yt</a>
             </div>
         </div>
     </div>

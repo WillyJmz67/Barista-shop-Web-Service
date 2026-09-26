@@ -2,9 +2,11 @@ __pycache__/
 *.py[cod]
 *.pyo
 .env
+.flask_secret
 instance/
 *.db
 .DS_Store
 *.log
 .venv/
 venv/
+.vercel/

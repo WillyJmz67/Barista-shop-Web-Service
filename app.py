@@ -1,24 +1,88 @@
 import os
 import json
+import logging
 import mercadopago
 from urllib.parse import quote
 from datetime import datetime
+from pathlib import Path
 from flask import (
     Flask, render_template, request, jsonify,
     send_from_directory, redirect, session, url_for, Response
 )
+from flask_wtf.csrf import CSRFProtect
 from models import db, Product, Order, OrderItem
 
-app = Flask(__name__)
-app.secret_key = os.environ.get("FLASK_SECRET_KEY", os.urandom(24).hex())
+# Configurar logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(name)s: %(message)s"
+)
+logger = logging.getLogger(__name__)
 
-DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///tienda.db")
-if DATABASE_URL.startswith("postgres://"):
-    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+app = Flask(__name__)
+
+# Secret key: Vercel + Supabase -> SIEMPRE por variable de entorno en producción.
+# En serverless el filesystem es read-only, no se puede persistir .flask_secret.
+_default_secret = os.environ.get("FLASK_SECRET_KEY")
+_on_vercel = bool(os.environ.get("VERCEL"))
+if _default_secret:
+    app.secret_key = _default_secret
+elif _on_vercel:
+    # No romper el cold-start: usar clave efímera y loguear aviso.
+    # Las sesiones admin no persistirán entre deploys si no se define la variable.
+    logger.warning("FLASK_SECRET_KEY no definido en Vercel: usando clave efímera. Define la variable en el dashboard.")
+    app.secret_key = os.urandom(32).hex()
+elif os.environ.get("ENV", "").lower() == "production" or os.environ.get("FLASK_ENV", "").lower() == "production":
+    raise RuntimeError("FLASK_SECRET_KEY debe estar definido en variables de entorno en producción")
+else:
+    # Desarrollo local: clave persistente en archivo local
+    secret_file = Path(__file__).parent / ".flask_secret"
+    try:
+        if secret_file.exists():
+            app.secret_key = secret_file.read_text().strip()
+        else:
+            app.secret_key = os.urandom(32).hex()
+            secret_file.write_text(app.secret_key)
+            try:
+                secret_file.chmod(0o600)
+            except OSError:
+                pass
+    except OSError:
+        app.secret_key = os.urandom(32).hex()
+
+# CSRF Protection
+app.config["WTF_CSRF_ENABLED"] = True
+app.config["WTF_CSRF_TIME_LIMIT"] = None  # Sin límite de tiempo para el token
+csrf = CSRFProtect(app)
+
+def _normalize_database_url(url: str) -> str:
+    """Normaliza DATABASE_URL para Supabase / Postgres / SQLite."""
+    if not url:
+        return "sqlite:///tienda.db"
+    if url.startswith("postgres://"):
+        url = url.replace("postgres://", "postgresql://", 1)
+    # Supabase pooler (pgbouncer) recomienda statement_cache_size=0 con SQLAlchemy/psycopg2.
+    # No lo forzamos aquí para no romper URLs locales, pero se documenta en .env.example.
+    return url
+
+
+DATABASE_URL = _normalize_database_url(os.environ.get("DATABASE_URL", "sqlite:///tienda.db"))
+_IS_SQLITE = DATABASE_URL.startswith("sqlite")
 
 app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {"pool_pre_ping": True}
+if _IS_SQLITE:
+    app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {"pool_pre_ping": True}
+else:
+    # Supabase Postgres (serverless): conexiones cortas, ping antes de usar,
+    # reciclaje para evitar conexiones muertas del pooler.
+    app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+        "pool_pre_ping": True,
+        "pool_recycle": 300,
+        "pool_size": 5,
+        "max_overflow": 10,
+        "connect_args": {"connect_timeout": 10},
+    }
 
 MP_ACCESS_TOKEN = os.environ.get("MP_ACCESS_TOKEN", "")
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "admin123")
@@ -26,8 +90,20 @@ WHATSAPP_NUMBER = os.environ.get("WHATSAPP_NUMBER", "573173169936")
 
 db.init_app(app)
 
-with app.app_context():
-    db.create_all()
+# En Vercel (serverless) no hacer create_all() agresivo en cada cold-start.
+# Las tablas se crean con supabase/schema.sql o seed_supabase.py.
+# Solo auto-crear en SQLite local o si se permite explícitamente.
+_AUTO_CREATE = os.environ.get("ALLOW_DB_CREATE", "1") == "1"
+if _IS_SQLITE or (_AUTO_CREATE and not _on_vercel):
+    with app.app_context():
+        try:
+            db.create_all()
+        except Exception as e:
+            logger.warning(f"No se pudo auto-crear tablas: {e}")
+elif _on_vercel:
+    # Intento ligero y tolerante a fallos: si Supabase aún no tiene tablas,
+    # las APIs devolverán [] en vez de romper el import.
+    pass
 
 
 def require_admin(f):
@@ -67,6 +143,15 @@ def build_whatsapp_url(items, total, shipping=None, order_id=None):
 
 def create_order_from_cart(items, shipping=None):
     shipping = shipping or {}
+    # Validar stock antes de crear el pedido
+    for item in items:
+        product = db.session.get(Product, item.get("id", 0))
+        if product and product.stock is False:
+            raise ValueError(f"Producto sin stock: {product.nombre}")
+        if product and product.stock is True and item.get("cantidad", 1) > 999:
+            # Límite razonable por producto
+            raise ValueError(f"Cantidad inválida para {product.nombre}")
+    
     total = sum(int(item["cantidad"]) * float(item["precio"]) for item in items)
     order = Order(
         total=int(total),
@@ -140,15 +225,35 @@ def data_files(filename):
     return send_from_directory("data", filename)
 
 
+@app.route("/api/health")
+def api_health():
+    """Healthcheck para Vercel / Supabase."""
+    status = {"ok": True, "db": "unknown"}
+    try:
+        db.session.execute(db.text("SELECT 1"))
+        status["db"] = "up"
+    except Exception as e:
+        status["db"] = f"down: {e}"
+    return jsonify(status)
+
+
 @app.route("/api/productos")
 def api_productos():
-    productos = Product.query.filter_by(stock=True).order_by(Product.id).all()
+    try:
+        productos = Product.query.filter_by(stock=True).order_by(Product.id).all()
+    except Exception as e:
+        logger.warning(f"/api/productos sin tablas o DB caída: {e}")
+        return jsonify([])
     return jsonify([p.to_dict() for p in productos])
 
 
 @app.route("/api/productos/destacados")
 def api_productos_destacados():
-    productos = Product.query.filter_by(destacado=True, stock=True).all()
+    try:
+        productos = Product.query.filter_by(destacado=True, stock=True).all()
+    except Exception as e:
+        logger.warning(f"/api/productos/destacados sin tablas o DB caída: {e}")
+        return jsonify([])
     return jsonify([p.to_dict() for p in productos])
 
 
@@ -160,8 +265,14 @@ def whatsapp_order():
         return jsonify({"error": "Carrito vacío"}), 400
 
     shipping = data.get("shipping", {})
-    order, total = create_order_from_cart(items, shipping)
+    try:
+        order, total = create_order_from_cart(items, shipping)
+    except ValueError as e:
+        logger.warning(f"WhatsApp order validation failed: {e}")
+        return jsonify({"error": str(e)}), 400
+
     url = build_whatsapp_url(items, total, shipping, order.id)
+    logger.info(f"WhatsApp order created: order_id={order.id}, total={total}, items={len(items)}")
     return jsonify({"url": url, "order_id": order.id})
 
 
@@ -174,7 +285,10 @@ def create_preference():
     if not items:
         return jsonify({"error": "Carrito vacío"}), 400
 
-    order, total = create_order_from_cart(items, shipping)
+    try:
+        order, total = create_order_from_cart(items, shipping)
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
 
     if not MP_ACCESS_TOKEN:
         return jsonify({
@@ -222,10 +336,12 @@ def create_preference():
 
         order.preference_id = preference_id or ""
         db.session.commit()
+        logger.info(f"MercadoPago preference created for order {order.id}: {preference_id}")
 
         return jsonify({"init_point": init_point, "order_id": order.id})
 
-    except Exception:
+    except Exception as e:
+        logger.error(f"Error creating MercadoPago preference for order {order.id}: {e}")
         return jsonify({
             "fallback": True,
             "url": build_whatsapp_url(items, total, shipping, order.id),
@@ -245,13 +361,14 @@ def mercadopago_webhook():
                 status = payment.get("response", {}).get("status")
                 external_ref = payment.get("response", {}).get("external_reference")
                 if external_ref and status == "approved":
-                    order = Order.query.get(int(external_ref))
+                    order = db.session.get(Order, int(external_ref))
                     if order:
                         order.status = "Pagado"
                         order.payment_id = str(payment_id)
                         db.session.commit()
-            except Exception:
-                pass
+                        logger.info(f"Order {order.id} marked as Pagado via webhook (payment {payment_id})")
+            except Exception as e:
+                logger.error(f"Error processing MercadoPago webhook: {e}")
     return jsonify({"ok": True})
 
 
@@ -262,7 +379,9 @@ def admin_login():
     if request.method == "POST":
         if request.form.get("password") == ADMIN_PASSWORD:
             session["admin_logged_in"] = True
+            logger.info("Admin login successful")
             return redirect(url_for("admin_dashboard"))
+        logger.warning("Admin login failed: invalid password")
         return render_template("admin/login.html", error="Contraseña incorrecta")
     return render_template("admin/login.html")
 
@@ -270,6 +389,7 @@ def admin_login():
 @app.route("/admin/logout")
 def admin_logout():
     session.pop("admin_logged_in", None)
+    logger.info("Admin logout")
     return redirect(url_for("admin_login"))
 
 
@@ -315,6 +435,7 @@ def admin_producto_nuevo():
         )
         db.session.add(p)
         db.session.commit()
+        logger.info(f"Admin created product: {p.id} - {p.nombre}")
         return redirect(url_for("admin_productos"))
     return render_template("admin/product_form.html", producto=None)
 
@@ -322,7 +443,7 @@ def admin_producto_nuevo():
 @app.route("/admin/productos/editar/<int:id>", methods=["GET", "POST"])
 @require_admin
 def admin_producto_editar(id):
-    p = Product.query.get_or_404(id)
+    p = db.get_or_404(Product, id)
     if request.method == "POST":
         p.nombre = request.form["nombre"]
         p.slug = request.form["slug"]
@@ -334,6 +455,7 @@ def admin_producto_editar(id):
         p.destacado = request.form.get("destacado") == "on"
         p.stock = request.form.get("stock") == "on"
         db.session.commit()
+        logger.info(f"Admin updated product: {p.id} - {p.nombre}")
         return redirect(url_for("admin_productos"))
     return render_template("admin/product_form.html", producto=p)
 
@@ -341,9 +463,11 @@ def admin_producto_editar(id):
 @app.route("/admin/productos/eliminar/<int:id>", methods=["POST"])
 @require_admin
 def admin_producto_eliminar(id):
-    p = Product.query.get_or_404(id)
+    p = db.get_or_404(Product, id)
+    nombre = p.nombre
     db.session.delete(p)
     db.session.commit()
+    logger.info(f"Admin deleted product: {id} - {nombre}")
     return redirect(url_for("admin_productos"))
 
 
@@ -357,9 +481,10 @@ def admin_pedidos():
 @app.route("/admin/pedidos/<int:id>/estado", methods=["POST"])
 @require_admin
 def admin_pedido_estado(id):
-    order = Order.query.get_or_404(id)
+    order = db.get_or_404(Order, id)
     order.status = request.form.get("status", order.status)
     db.session.commit()
+    logger.info(f"Admin updated order {id} status to {order.status}")
     return redirect(url_for("admin_pedidos"))
 
 
@@ -369,21 +494,47 @@ def admin_pedido_estado(id):
 def pg_exito():
     order_id = request.args.get("order_id")
     if order_id:
-        order = Order.query.get(order_id)
+        try:
+            order = db.session.get(Order, int(order_id))
+        except (ValueError, TypeError):
+            order = None
         if order:
             order.status = "Pagado"
             db.session.commit()
+            logger.info(f"Order {order_id} marked as Pagado via success page")
     return render_template("exito.html", order_id=order_id)
 
 
 @app.route("/pg/error")
 def pg_error():
+    logger.warning("MercadoPago payment error page accessed")
     return render_template("error.html")
 
 
 @app.route("/pg/pending")
 def pg_pending():
+    logger.info("MercadoPago payment pending page accessed")
     return render_template("pending.html")
+
+
+# ─── ERROR HANDLERS ───────────────────────────────────
+
+@app.errorhandler(404)
+def not_found(e):
+    logger.warning(f"404 Not Found: {request.path}")
+    return render_template("error.html", message="Página no encontrada"), 404
+
+
+@app.errorhandler(500)
+def internal_error(e):
+    logger.error(f"500 Internal Server Error: {e}")
+    return render_template("error.html", message="Error interno del servidor"), 500
+
+
+# CSRF exemptions for public APIs (must be after route definitions)
+csrf.exempt(whatsapp_order)
+csrf.exempt(create_preference)
+csrf.exempt(mercadopago_webhook)
 
 
 if __name__ == "__main__":
