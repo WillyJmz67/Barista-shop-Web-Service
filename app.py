@@ -205,24 +205,34 @@ def config_js():
     return Response(body, mimetype="application/javascript")
 
 
+# Rutas absolutas basadas en app.root_path: en Vercel serverless el CWD
+# no es necesariamente la raíz del proyecto (filesystem read-only).
+_STATIC_DIRS = {
+    "js": os.path.join(app.root_path, "js"),
+    "css": os.path.join(app.root_path, "css"),
+    "img": os.path.join(app.root_path, "img"),
+    "data": os.path.join(app.root_path, "data"),
+}
+
+
 @app.route("/js/<path:filename>")
 def js_files(filename):
-    return send_from_directory("js", filename)
+    return send_from_directory(_STATIC_DIRS["js"], filename)
 
 
 @app.route("/css/<path:filename>")
 def css_files(filename):
-    return send_from_directory("css", filename)
+    return send_from_directory(_STATIC_DIRS["css"], filename)
 
 
 @app.route("/img/<path:filename>")
 def img_files(filename):
-    return send_from_directory("img", filename)
+    return send_from_directory(_STATIC_DIRS["img"], filename)
 
 
 @app.route("/data/<path:filename>")
 def data_files(filename):
-    return send_from_directory("data", filename)
+    return send_from_directory(_STATIC_DIRS["data"], filename)
 
 
 @app.route("/api/health")
@@ -519,16 +529,31 @@ def pg_pending():
 
 # ─── ERROR HANDLERS ───────────────────────────────────
 
+@app.teardown_appcontext
+def shutdown_session(exception=None):
+    # Higiene del pool en serverless: devuelve la conexión al pooler de Supabase.
+    db.session.remove()
+
+
 @app.errorhandler(404)
 def not_found(e):
     logger.warning(f"404 Not Found: {request.path}")
-    return render_template("error.html", message="Página no encontrada"), 404
+    try:
+        return render_template("error.html", message="Página no encontrada"), 404
+    except Exception:
+        return Response("Página no encontrada", status=404, mimetype="text/plain")
 
 
 @app.errorhandler(500)
 def internal_error(e):
-    logger.error(f"500 Internal Server Error: {e}")
-    return render_template("error.html", message="Error interno del servidor"), 500
+    # logger.exception incluye el traceback completo: visible en Vercel > Logs.
+    logger.exception(f"500 Internal Server Error: {e}")
+    try:
+        return render_template("error.html", message="Error interno del servidor"), 500
+    except Exception:
+        # Si hasta el template de error falla (ej. bundle sin templates),
+        # devolver texto plano en vez de romper la función serverless.
+        return Response("Error interno del servidor", status=500, mimetype="text/plain")
 
 
 # CSRF exemptions for public APIs (must be after route definitions)
