@@ -547,7 +547,15 @@ def shutdown_session(exception=None):
 
 @app.errorhandler(404)
 def not_found(e):
-    logger.warning(f"404 Not Found: {request.path}")
+    # Log de diagnóstico para Vercel: muestra qué path recibió realmente Flask.
+    logger.warning(
+        "404 Not Found: path=%s full=%s script=%s info=%s uri=%s",
+        request.path,
+        request.full_path,
+        request.environ.get("SCRIPT_NAME", ""),
+        request.environ.get("PATH_INFO", ""),
+        request.environ.get("REQUEST_URI", ""),
+    )
     try:
         return render_template("error.html", message="Página no encontrada"), 404
     except Exception:
